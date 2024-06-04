@@ -1,11 +1,11 @@
-# Definição da função
+
 def f(x):
-    return x * x
+    return  0*x**9 + 0*x**8 - 0*x**7 + 0.02*x**6 - 0.36*x**5 + 3.93*x**4 - 25.29*x**3 + 87.78*x**2 - 124.23*x
 
 # Dados de entrada
 a = 1
-b = 3
-n = 4  # Definindo um número inteiro de subintervalos
+b = 38
+n = 100000  # Definindo um número inteiro de subintervalos
 h = (b - a) / n
 
 # Inicializando as somas
@@ -28,12 +28,19 @@ for i in range(n):
     xm = a + (i + 0.5) * h
     soma_media += f(xm)
 
+#Valor médio
+integral = 177.67
+valor_medio = integral / b-a
+
 # Multiplicando pela largura dos subintervalos
 aprox_inferior = h * soma_inferior
 aprox_superior = h * soma_superior
 aprox_media = h * soma_media
 
 # Imprimindo os resultados
+print('==============================================')
 print(f'Aproximação Inferior: {aprox_inferior:.4f}')
 print(f'Aproximação Superior: {aprox_superior:.4f}')
 print(f'Aproximação dos Pontos Médios: {aprox_media:.4f}')
+print(f'O valor médio da função é {valor_medio:.4f}')
+print('==============================================')
