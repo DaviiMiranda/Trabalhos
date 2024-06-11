@@ -3,22 +3,22 @@ from scipy.integrate import quad
 
 # Definindo os pedaços da função f(x)
 def f1(x):
-    return 0.2 * x + 0.89
+    return 0.2 * x + 0.90
 
 def f2(x):
-    return -0.2333333333333333 * x**2 + 1.85 * x - 1.476666666667
+    return -0.2333333333333333 * x**2 + 1.85 * x - 1.4666666666667
 
 def f3(x):
-    return 2.19
+    return 2.2
 
 def f4(x):
-    return 0.5 * x**2 - 8 * x + 33.69
+    return x**2 - 16 * x + 65.2
 
 def f5(x):
-    return 2.19
+    return 2.20
 
 def f6(x):
-    return -0.44 * x**2 + 11.76 * x - 76.21
+    return -0.4 * x**2 + 10.6 * x - 67.8
 
 # Função integrand (pi * [f(x)]^2)
 def integrand1(x):
