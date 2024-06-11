@@ -1,0 +1,56 @@
+import numpy as np
+from scipy.integrate import quad
+
+# Definindo os pedaços da função f(x)
+def f1(x):
+    return 0.2 * x + 0.89
+
+def f2(x):
+    return -0.2333333333333333 * x**2 + 1.85 * x - 1.476666666667
+
+def f3(x):
+    return 2.19
+
+def f4(x):
+    return 0.5 * x**2 - 8 * x + 33.69
+
+def f5(x):
+    return 2.19
+
+def f6(x):
+    return -0.44 * x**2 + 11.76 * x - 76.21
+
+# Função integrand (pi * [f(x)]^2)
+def integrand1(x):
+    return np.pi * (f1(x))**2
+
+def integrand2(x):
+    return np.pi * (f2(x))**2
+
+def integrand3(x):
+    return np.pi * (f3(x))**2
+
+def integrand4(x):
+    return np.pi * (f4(x))**2
+
+def integrand5(x):
+    return np.pi * (f5(x))**2
+
+def integrand6(x):
+    return np.pi * (f6(x))**2
+
+# Cálculo da integral definida para cada intervalo
+volume1, error1 = quad(integrand1, 0, 2)
+volume2, error2 = quad(integrand2, 2, 4)
+volume3, error3 = quad(integrand3, 4, 7)
+volume4, error4 = quad(integrand4, 7, 9)
+volume5, error5 = quad(integrand5, 9, 14)
+volume6, error6 = quad(integrand6, 14, 15)
+
+# Somar os volumes dos intervalos
+total_volume = volume1 + volume2 + volume3 + volume4 + volume5 + volume6
+
+# Imprimir o resultado
+print('==='*20)
+print(f"Volume total da garrafa: {total_volume:.2f} unidades cúbicas")
+print('==='*20)
