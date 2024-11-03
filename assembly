@@ -1,0 +1,191 @@
+#Tentativa1
+.eqv 	num 		$t1
+.eqv 	resto 		$t2
+.eqv 	char 		$t3
+.eqv 	index_buf 	$t4
+.eqv 	index_num 	$t5
+.eqv 	quociente 	$t6
+.eqv	index_lista	$t7
+.eqv	ende		$t8
+.eqv	flag		$t9
+.eqv	LENGHT		12
+
+.data
+	file_name: .asciiz "C:\\Users\\davim\\OneDrive\\Área de Trabalho\\Trabalho AV2 - Arquitetura de Comp\\lista_teste.txt"
+		.align 2
+	resposta: .asciiz "C:\\Users\\davim\\OneDrive\\Área de Trabalho\\resposta AV2 arq..txt"
+	array: .space 1024
+	buffer: .space 1024
+	lista_char: .space 1024
+	
+.text
+####LEITURA
+	li $v0,13	# solicita abertura
+	la $a0,file_name	# endereço do arquivo
+	li $a1,0 	#0:leitura e 1:escrita
+	syscall		#descritor do aqr vai para $v0
+	
+	move $s0, $v0 	#copia do descritor
+	move $a0, $s0
+	li $v0, 14 	#ler conteúdo do arquivo referenciado por $a0
+	la $a1, buffer	#buffer que armazena o conteudo
+	li $a2, 1024 		#tamanho do buffer
+	syscall 			#leitura realizada
+	
+	
+	#fechar o arquivo
+	li $v0, 16
+	move $a0, $s0
+	syscall
+	
+####CONVERSÃO DE CARACTERE PARA NUMERO---------------------------------------------------------------
+	
+	li $t1, 0                      # $t1 será usado para o índice no array de números (numero_array)
+    	li $t2, 0                      # $t2 será usado para o índice no buffer de caracteres
+    	li $t3, 0                      # $t3 para construir o número atual
+    	li $t4, 1                      # Flag para o sinal do número (1 para positivo, -1 para negativo)
+
+parse_buffer:
+    lb $t5, buffer($t2)            # Carrega um caractere do buffer em $t5
+    beqz $t5, end_of_parse         # Se for o final do arquivo (NULL), termina
+
+    # Verifica se é um sinal de negativo
+    li $t6, '-'                    # ASCII para '-'
+    beq $t5, $t6, set_negative
+    li $t6, ','                    # ASCII para vírgula
+    beq $t5, $t6, store_number
+
+    # Converte o caractere em número e acumula
+    li $t6, '0'                    # ASCII para '0'
+    sub $t5, $t5, $t6              # Converte caractere ASCII para valor numérico
+    mul $t3, $t3, 10               # Multiplica o número acumulado por 10
+    add $t3, $t3, $t5              # Adiciona o dígito atual
+
+    # Avança para o próximo caractere
+    addi $t2, $t2, 1
+    j parse_buffer
+
+# Configura a flag para número negativo
+set_negative:
+    li $t4, -1                     # Define a flag de sinal para negativo
+    addi $t2, $t2, 1               # Avança para o próximo caractere
+    j parse_buffer
+
+# Armazena o número no array
+store_number:
+    mul $t3, $t3, $t4              # Aplica o sinal ao número
+    sw $t3, array($t1)      # Salva o número em numero_array
+    addi $t1, $t1, 4               # Avança para a próxima posição do array
+    li $t3, 0                      # Reinicializa o número acumulado
+    li $t4, 1                      # Reinicializa o sinal para positivo
+    addi $t2, $t2, 1               # Avança para o próximo caractere
+    j parse_buffer
+
+# Fim da conversão
+end_of_parse:
+    # Fechar o arquivo
+    li $v0, 16                     # Syscall para fechar o arquivo
+    move $a0, $t0                  # Descritor de arquivo
+    syscall
+	
+	
+	
+	
+####ORDENAÇÃO----------------------------------------------------------------------------------------------
+	
+bubble_sort:
+    li $t1, 0                      # Índice para o início do array
+    
+outer_loop:
+    move $t2, $t1                  # Índice para a posição atual
+
+inner_loop:
+    lw $t3, array($t2)      # Carrega o elemento atual em $t3
+    lw $t4, 4($t2)                 # Carrega o próximo elemento em $t4
+    
+    # Compara $t3 e $t4
+    ble $t3, $t4, skip_swap        # Se $t3 <= $t4, vá para 'skip_swap'
+    
+    # Troca $t3 e $t4
+    sw $t4, array($t2)      # Salva $t4 na posição atual
+    sw $t3, 4($t2)                 # Salva $t3 na próxima posição
+
+skip_swap:
+    addi $t2, $t2, 4               # Avança para a próxima posição do array
+    bne $t2, $t0, inner_loop       # Continua até o final do array
+
+    sub $t0, $t0, 4                # Diminui o limite para a próxima passagem
+    bgtz $t0, outer_loop           # Repete o loop até que todo o array esteja ordenado
+
+
+
+
+
+
+
+
+
+####CONVERSÃO PARA CARACTERE-------------------------------------------------------------------------------------------
+	li index_lista,0
+	li index_num,0
+restart:
+	li	flag,0
+	li	index_buf,0
+
+teste_sinal:
+	beq	index_num,LENGHT,escrita
+	lw	num,array(index_num)
+	add	index_num,index_num,4
+	bge	num,$zero,converte #se for negativo segue, se não vai pro converte
+	li	flag,1
+	mul	num,num,-1
+	
+converte:
+	move	quociente,num
+proximo:
+	li	$t0,10
+	div	quociente,$t0 #divide por 10
+	mfhi	resto
+	mflo	quociente
+	add	char,resto,0x30
+	sb	char,buffer(index_buf)
+	add	index_buf,index_buf,1
+	bnez	quociente,proximo
+	beqz	flag,ordenacao
+	li	$t0,'-'
+	sb	$t0,buffer(index_buf)
+	add	index_buf,index_buf,1
+	
+ordenacao:
+	beqz	index_buf, sai
+	add	index_buf,index_buf, -1
+	lb	char, buffer(index_buf)
+	sb	char, lista_char(index_lista)
+	add	index_lista, index_lista, 1
+	j	ordenacao	
+sai:
+	li	$t0,','
+	sb	$t0,lista_char(index_lista)
+	add	index_lista,index_lista,1
+	j	restart
+####ESCRITA-------------------------------------------------------------------------------------------------------
+	
+escrita:
+	li	$v0,13
+	la	$a0,resposta
+	li	$a1,1
+	li	$a2,0
+	syscall
+	
+	move	$t0,$v0
+	li	$v0,15
+	move	$a0,$t0
+	la	$a1,buffer
+	li	$a2,4
+	syscall
+fim:
+	li	$v0,10
+	syscall
+	
+
+
