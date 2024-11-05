@@ -74,7 +74,7 @@ set_negative:
 # Armazena o número no array
 store_number:
     mul $t3, $t3, $t4              # Aplica o sinal ao número
-    sw $t3, array($t1)      # Salva o número em numero_array
+    sw $t3, array($t1)      # Salva o número em numero_array ERRO aqui
     addi $t1, $t1, 4               # Avança para a próxima posição do array
     li $t3, 0                      # Reinicializa o número acumulado
     li $t4, 1                      # Reinicializa o sinal para positivo
@@ -134,7 +134,7 @@ restart:
 
 teste_sinal:
 	beq	index_num,LENGHT,escrita
-	lw	num,array(index_num)
+	lw	num,array(index_num)# Carrega o número do array.	
 	add	index_num,index_num,4
 	bge	num,$zero,converte #se for negativo segue, se não vai pro converte
 	li	flag,1
@@ -145,15 +145,15 @@ converte:
 proximo:
 	li	$t0,10
 	div	quociente,$t0 #divide por 10
-	mfhi	resto
+	mfhi	resto		# Obtém o resto.
 	mflo	quociente
-	add	char,resto,0x30
-	sb	char,buffer(index_buf)
+	add	char,resto,0x30	  # Converte para ASCII.
+	sb	char,buffer(index_buf)	 # Salva no buffer.
 	add	index_buf,index_buf,1
 	bnez	quociente,proximo
 	beqz	flag,ordenacao
-	li	$t0,'-'
-	sb	$t0,buffer(index_buf)
+	li	$t0,'-'		 
+	sb	$t0,buffer(index_buf) # Se negativo, adiciona '-'.
 	add	index_buf,index_buf,1
 	
 ordenacao:
@@ -165,26 +165,26 @@ ordenacao:
 	j	ordenacao	
 sai:
 	li	$t0,','
-	sb	$t0,lista_char(index_lista)
+	sb	$t0,lista_char(index_lista)# Adiciona vírgula.
 	add	index_lista,index_lista,1
 	j	restart
 ####ESCRITA-------------------------------------------------------------------------------------------------------
 	
 escrita:
-	li	$v0,13
+	li	$v0,13	# Syscall para abrir arquivo de saída.
 	la	$a0,resposta
-	li	$a1,1
+	li	$a1,1	 # 1 para escrita.
 	li	$a2,0
 	syscall
 	
 	move	$t0,$v0
-	li	$v0,15
+	li	$v0,15	# Escreve no arquivo.
 	move	$a0,$t0
 	la	$a1,buffer
 	li	$a2,4
 	syscall
 fim:
-	li	$v0,10
+	li	$v0,10	 # Encerra.
 	syscall
 	
 
